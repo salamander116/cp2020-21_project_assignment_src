@@ -18,7 +18,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<sys/time.h>
-#include<omp-tools.h>
+#include "omp.h"
 
 /* Function to get wall time */
 double cp_Wtime(){
@@ -173,14 +173,25 @@ int main(int argc, char *argv[]) {
         fprintf(stderr,"Error: Allocating the layer memory\n");
         exit( EXIT_FAILURE );
     }
-    for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
-    for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
     
+    //for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
+    //for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
+
+    
+        for( k=0; k<layer_size; k++ ){
+            layer[k] = 0.0f;            
+            layer_copy[k] = 0.0f;
+        }
+
+
     /* 4. Storms simulation */
     for( i=0; i<num_storms; i++) {
+        printf("%lf\n", cp_Wtime());
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
+
+        #pragma omp parallel for
         for( j=0; j<storms[i].size; j++ ) {
             /* Get impact energy (expressed in thousandths) */
             float energy = (float)storms[i].posval[j*2+1] * 1000;
@@ -188,6 +199,7 @@ int main(int argc, char *argv[]) {
             int position = storms[i].posval[j*2];
 
             /* For each cell in the layer */
+            #pragma omp parallel for
             for( k=0; k<layer_size; k++ ) {
                 /* Update the energy value for the cell */
                 update( layer, layer_size, k, position, energy );
