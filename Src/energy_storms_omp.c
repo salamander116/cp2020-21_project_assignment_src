@@ -137,7 +137,7 @@ Storm read_storm_file( char *fname ) {
  * MAIN PROGRAM
  */
 int main(int argc, char *argv[]) {
-    int i,j,k;
+    int i,j,k, m;
 
     /* 1.1. Read arguments */
     if (argc<3) {
@@ -191,34 +191,37 @@ int main(int argc, char *argv[]) {
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
 
-        #pragma omp parallel for
-        for( j=0; j<storms[i].size; j++ ) {
-            /* Get impact energy (expressed in thousandths) */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
-            /* Get impact position */
-            int position = storms[i].posval[j*2];
+        #pragma omp parallel
+        {
 
-            /* For each cell in the layer */
-            #pragma omp parallel for
-            for( k=0; k<layer_size; k++ ) {
-                /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy );
+            #pragma omp for
+            for( j=0; j<storms[i].size; j++ ) {
+                /* Get impact energy (expressed in thousandths) */
+                float energy = (float)storms[i].posval[j*2+1] * 1000;
+                /* Get impact position */
+                int position = storms[i].posval[j*2];
+
+                /* For each cell in the layer */
+                
+                #pragma omp taskloop
+                for( k=0; k<layer_size; k++ ) {
+                    /* Update the energy value for the cell */
+                    
+                    update( layer, layer_size, k, position, energy );
+                }
             }
         }
+       
 
         
-        #pragma omp parallel for
-        for( k=0; k<layer_size; k++ ) {
+        for( k=0; k<layer_size; k++ ) 
             layer_copy[k] = layer[k];
-        }
 
         /* 4.2.2. Update layer using the ancillary values.
                   Skip updating the first and last positions */
-        
-        #pragma omp parallel for
-        for( k=1; k<layer_size-1; k++ ){
+        for( k=1; k<layer_size-1; k++ )
             layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-        }
+        
 
         
 
