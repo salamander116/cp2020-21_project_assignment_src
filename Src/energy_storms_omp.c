@@ -211,18 +211,32 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-       
 
-        
-        for( k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
+        /* Parameter of number of workers*/
+        int thrnum = 4;
+        int split = (layer_size/thrnum);
 
-        /* 4.2.2. Update layer using the ancillary values.
-                  Skip updating the first and last positions */
-        for( k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-        
+        #pragma omp parallel
+        {
+            
+            #pragma omp for private(m,k)
+            for(m = 0; m<thrnum; m++){
+                for(k=m*split; k< (m*(split) + split) ; k++ ){
+                   
+                    layer_copy[k] = layer[k];
+                }
+            }
+            
 
+            #pragma omp barrier
+            
+            #pragma omp for private(k)
+            for( k=1; k<layer_size-1; k++ ){
+                #pragma omp critical
+                layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+            }
+
+        }
         
 
         /* 4.2. Energy relaxation between storms */
