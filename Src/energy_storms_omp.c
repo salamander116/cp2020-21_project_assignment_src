@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
     //for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
 
     
-        for( k=0; k<layer_size; k++ ){
+    for( k=0; k<layer_size; k++ ){
             layer[k] = 0.0f;            
             layer_copy[k] = 0.0f;
         }
@@ -212,6 +212,9 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        /* 4.2. Energy relaxation between storms */
+        /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
+
         /* Parameter of number of workers*/
         int thrnum = 4;
         int split = (layer_size/thrnum);
@@ -239,32 +242,24 @@ int main(int argc, char *argv[]) {
         }
         
 
-        /* 4.2. Energy relaxation between storms */
-        /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
-        
-        
-        /* Skip updating the first and last positions 
-
-        layer_copy[0] = layer[0];
-        layer_copy[layer_size-1] = layer[layer_size-1];
-
-        #pragma omp parallel for
-        for( k=1; k<layer_size-1; k++ ){
-            layer_copy[k] = layer[k];
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-        }
-        
-        */
-        /* 4.3. Locate the maximum value in the layer, and its position */
-        for( k=1; k<layer_size-1; k++ ) {
+        #pragma omp parallel
+        {
+            #pragma omp for private(k)
+            for( k=1; k<layer_size-1; k++ ) {
             /* Check it only if it is a local maximum */
-            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                if ( layer[k] > maximum[i] ) {
-                    maximum[i] = layer[k];
-                    positions[i] = k;
+                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                    if ( layer[k] > maximum[i] ) {
+                        #pragma omp critical
+                        {
+                            maximum[i] = layer[k];
+                            positions[i] = k;
+                        } 
+                    }
                 }
             }
         }
+
+        /* 4.3. Locate the maximum value in the layer, and its position */
     }
 
     /* END: Do NOT optimize/parallelize the code below this point */
