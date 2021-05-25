@@ -136,6 +136,35 @@ Storm read_storm_file( char *fname ) {
 /*
  * MAIN PROGRAM
  */
+ void impact(int i, int j, int k, Storm storms[], int num_storms, float *layer, int layer_size){
+     for( i=0; i<num_storms; i++) {
+        printf("%lf\n", cp_Wtime());
+
+        /* 4.1. Add impacts energies to layer cells */
+        /* For each particle */
+
+        #pragma omp parallel
+        {
+
+            #pragma omp for
+            for( j=0; j<storms[i].size; j++ ) {
+                /* Get impact energy (expressed in thousandths) */
+                float energy = (float)storms[i].posval[j*2+1] * 1000;
+                /* Get impact position */
+                int position = storms[i].posval[j*2];
+
+                /* For each cell in the layer */
+                
+                #pragma omp taskloop
+                for( k=0; k<layer_size; k++ ) {
+                    /* Update the energy value for the cell */
+                    
+                    update( layer, layer_size, k, position, energy );
+                }
+            }
+        }
+     }
+ }
 int main(int argc, char *argv[]) {
     int i,j,k, m;
 
@@ -191,26 +220,7 @@ int main(int argc, char *argv[]) {
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
 
-        #pragma omp parallel
-        {
-
-            #pragma omp for
-            for( j=0; j<storms[i].size; j++ ) {
-                /* Get impact energy (expressed in thousandths) */
-                float energy = (float)storms[i].posval[j*2+1] * 1000;
-                /* Get impact position */
-                int position = storms[i].posval[j*2];
-
-                /* For each cell in the layer */
-                
-                #pragma omp taskloop
-                for( k=0; k<layer_size; k++ ) {
-                    /* Update the energy value for the cell */
-                    
-                    update( layer, layer_size, k, position, energy );
-                }
-            }
-        }
+        impact(i,j,k,storms, num_storms, layer, layer_size);
 
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
@@ -232,7 +242,7 @@ int main(int argc, char *argv[]) {
             
 
             #pragma omp barrier
-            
+
             #pragma omp for private(k)
             for( k=1; k<layer_size-1; k++ ){
                 #pragma omp critical
