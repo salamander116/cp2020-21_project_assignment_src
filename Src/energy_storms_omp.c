@@ -165,6 +165,52 @@ Storm read_storm_file( char *fname ) {
         }
      }
  }
+
+ void relaxation(int m, int k, float *layer_copy, float *layer, int layer_size){
+        int thrnum = 4;
+        int split = (layer_size/thrnum);
+
+        #pragma omp parallel
+        {
+            
+            #pragma omp for private(m,k)
+            for(m = 0; m<thrnum; m++){
+                for(k=m*split; k< (m*(split) + split) ; k++ ){
+                   
+                    layer_copy[k] = layer[k];
+                }
+            }
+            
+
+            #pragma omp barrier
+
+            #pragma omp for private(k)
+            for( k=1; k<layer_size-1; k++ ){
+                #pragma omp critical
+                layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+            }
+
+        }
+        
+ }
+ void findMax(int k,int i, float *layer, int layer_size, float *maximum, int *positions ){
+     #pragma omp parallel
+        {
+            #pragma omp for private(k)
+            for( k=1; k<layer_size-1; k++ ) {
+            /* Check it only if it is a local maximum */
+                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                    if ( layer[k] > maximum[i] ) {
+                        #pragma omp critical
+                        {
+                            maximum[i] = layer[k];
+                            positions[i] = k;
+                        } 
+                    }
+                }
+            }
+        }
+ }
 int main(int argc, char *argv[]) {
     int i,j,k, m;
 
@@ -225,51 +271,10 @@ int main(int argc, char *argv[]) {
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
 
-        /* Parameter of number of workers*/
-        int thrnum = 4;
-        int split = (layer_size/thrnum);
-
-        #pragma omp parallel
-        {
-            
-            #pragma omp for private(m,k)
-            for(m = 0; m<thrnum; m++){
-                for(k=m*split; k< (m*(split) + split) ; k++ ){
-                   
-                    layer_copy[k] = layer[k];
-                }
-            }
-            
-
-            #pragma omp barrier
-
-            #pragma omp for private(k)
-            for( k=1; k<layer_size-1; k++ ){
-                #pragma omp critical
-                layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-            }
-
-        }
-        
-
-        #pragma omp parallel
-        {
-            #pragma omp for private(k)
-            for( k=1; k<layer_size-1; k++ ) {
-            /* Check it only if it is a local maximum */
-                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                    if ( layer[k] > maximum[i] ) {
-                        #pragma omp critical
-                        {
-                            maximum[i] = layer[k];
-                            positions[i] = k;
-                        } 
-                    }
-                }
-            }
-        }
-
+        relaxation(m,k, layer_copy, layer, layer_size);
+    
         /* 4.3. Locate the maximum value in the layer, and its position */
+        findMax(k,i,layer, layer_size, maximum, positions);
     }
 
     /* END: Do NOT optimize/parallelize the code below this point */
