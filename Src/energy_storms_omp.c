@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
     //for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
     //for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
 
-    
+    #pragma omp parallel for
     for( k=0; k<layer_size; k++ ){
             layer[k] = 0.0f;            
             layer_copy[k] = 0.0f;
@@ -186,8 +186,6 @@ int main(int argc, char *argv[]) {
 
 
     /* 4. Storms simulation */
-    #pragma omp parallel num_threads(num_storms)
-    {
     for( i=0; i<num_storms; i++) {
         printf("%lf\n", cp_Wtime());
 
@@ -196,7 +194,6 @@ int main(int argc, char *argv[]) {
 
         #pragma omp parallel
         {
-
             #pragma omp for 
             for( j=0; j<storms[i].size; j++ ) {
                 /* Get impact energy (expressed in thousandths) */
@@ -206,11 +203,13 @@ int main(int argc, char *argv[]) {
 
                 /* For each cell in the layer */
                 
-                #pragma omp taskloop
-                for( k=0; k<layer_size; k++ ) {
-                    /* Update the energy value for the cell */
-                    
-                    update( layer, layer_size, k, position, energy );
+                #pragma omp parallel
+                    {
+                    #pragma omp for
+                    for( k=0; k<layer_size; k++ ) {
+                        /* Update the energy value for the cell */
+                        update( layer, layer_size, k, position, energy );
+                    }
                 }
             }
         }
@@ -235,36 +234,36 @@ int main(int argc, char *argv[]) {
 
             #pragma omp barrier
             
-            #pragma omp for private(k)
-            for( k=1; k<layer_size-1; k++ ){
-                layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+            #pragma omp critical
+            {
+                for( k=1; k<layer_size-1; k++ ) {
+                    layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3; 
+                }
             }
-
         }
         
 
         #pragma omp parallel
         {
-            #pragma omp for private(k)
-            for( k=1; k<layer_size-1; k++ ) {
-            /* Check it only if it is a local maximum */
-                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                    if ( layer[k] > maximum[i] ) {
-                        #pragma omp critical
-                            {
+            #pragma omp for private(m,k)
+            for(m = 0; m<thrnum; m++) {
+                for( k=(m*split)+1; k<(m*split + split)-1; k++ ) {
+                    /* Check it only if it is a local maximum */
+                    #pragma omp critical
+                    {   
+                        if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                            if ( layer[k] > maximum[i] ) {
                                 maximum[i] = layer[k];
                                 positions[i] = k;
                             } 
                         }
                     }
-                
-            }
-                
+                }
+            }    
         }
-
         /* 4.3. Locate the maximum value in the layer, and its position */
         }
-    }
+    
     /* END: Do NOT optimize/parallelize the code below this point */
 
     /* 5. End time measurement */
