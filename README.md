@@ -48,7 +48,7 @@ $ oarsub -l nodes=2 -I
 ### Run tests
 ```bash
 $ cd Src
-$ make
+$ make all
 $ sh runtests.sh 3000
 ```
 *(where argument in runtests.sh is size of the layer array)*
