@@ -57,6 +57,7 @@ void update( float *layer, int layer_size, int k, int pos, float energy ) {
 
     /* 5. Do not add if its absolute value is lower than the threshold */
     if ( energy_k >= THRESHOLD / layer_size || energy_k <= -THRESHOLD / layer_size )
+        #pragma omp atomic update
         layer[k] = layer[k] + energy_k;
 }
 
@@ -177,7 +178,7 @@ int main(int argc, char *argv[]) {
     //for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
     //for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
 
-    
+    #pragma omp parallel for
     for( k=0; k<layer_size; k++ ){
             layer[k] = 0.0f;            
             layer_copy[k] = 0.0f;
@@ -193,8 +194,7 @@ int main(int argc, char *argv[]) {
 
         #pragma omp parallel
         {
-
-            #pragma omp for
+            #pragma omp for 
             for( j=0; j<storms[i].size; j++ ) {
                 /* Get impact energy (expressed in thousandths) */
                 float energy = (float)storms[i].posval[j*2+1] * 1000;
@@ -203,11 +203,13 @@ int main(int argc, char *argv[]) {
 
                 /* For each cell in the layer */
                 
-                #pragma omp taskloop
-                for( k=0; k<layer_size; k++ ) {
-                    /* Update the energy value for the cell */
-                    
-                    update( layer, layer_size, k, position, energy );
+                #pragma omp parallel
+                    {
+                    #pragma omp for
+                    for( k=0; k<layer_size; k++ ) {
+                        /* Update the energy value for the cell */
+                        update( layer, layer_size, k, position, energy );
+                    }
                 }
             }
         }
@@ -219,13 +221,12 @@ int main(int argc, char *argv[]) {
         int thrnum = 4;
         int split = (layer_size/thrnum);
 
-        #pragma omp parallel
+        #pragma omp parallel num_threads(thrnum)
         {
             
             #pragma omp for private(m,k)
             for(m = 0; m<thrnum; m++){
                 for(k=m*split; k< (m*(split) + split) ; k++ ){
-                   
                     layer_copy[k] = layer[k];
                 }
             }
@@ -233,35 +234,35 @@ int main(int argc, char *argv[]) {
 
             #pragma omp barrier
             
-            #pragma omp for private(k)
-            for( k=1; k<layer_size-1; k++ ){
-                #pragma omp critical
-                layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
-            }
-
+            
+                for( k=1; k<layer_size-1; k++ ) {
+                    layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3; 
+                }
+        
         }
         
 
         #pragma omp parallel
         {
-            #pragma omp for private(k)
-            for( k=1; k<layer_size-1; k++ ) {
-            /* Check it only if it is a local maximum */
-                if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                    if ( layer[k] > maximum[i] ) {
-                        #pragma omp critical
-                        {
-                            maximum[i] = layer[k];
-                            positions[i] = k;
-                        } 
+            #pragma omp for private(m,k)
+            for(m = 0; m<thrnum; m++) {
+                for( k=(m*split)+1; k<(m*split + split)-1; k++ ) {
+                    /* Check it only if it is a local maximum */
+                    #pragma omp critical
+                    {   
+                        if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                            if ( layer[k] > maximum[i] ) {
+                                maximum[i] = layer[k];
+                                positions[i] = k;
+                            } 
+                        }
                     }
                 }
-            }
+            }    
         }
-
         /* 4.3. Locate the maximum value in the layer, and its position */
-    }
-
+        }
+    
     /* END: Do NOT optimize/parallelize the code below this point */
 
     /* 5. End time measurement */
