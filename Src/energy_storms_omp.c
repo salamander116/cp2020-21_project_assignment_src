@@ -234,12 +234,11 @@ int main(int argc, char *argv[]) {
 
             #pragma omp barrier
             
-            #pragma omp critical
-            {
+            
                 for( k=1; k<layer_size-1; k++ ) {
                     layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3; 
                 }
-            }
+        
         }
         
 
