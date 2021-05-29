@@ -27,3 +27,41 @@ Use the input files in the test_files directory for your first tests.
 Students are encouraged to manually write or automatically generate
 their own input files for more complete tests. See a description of
 the input files format in the handout.
+
+## Setup and Test (Cluster)
+### Send files to DI Cluster and Login with SSH
+```bash
+$ scp -P 12034 -r Src cp-g03@cluster.di.fct.unl.pt:.
+cp-g03@cluster.di.fct.unl.pt's password: U!MHCk*3ye4qugL9cp
+```
+### SSH login
+```bash
+$ ssh -p 12034 cp-g03@cluster.di.fct.unl.pt
+cp-g03@cluster.di.fct.unl.pt's password: U!MHCk*3ye4qugL9cp
+```
+
+### Reserve nodes
+```bash
+$ oarsub -l nodes=2 -I
+```
+
+### Run tests
+```bash
+$ cd Src
+$ make all
+$ sh runtests.sh 3000
+```
+*(where argument in runtests.sh is size of the layer array)*
+
+### Download files
+```bash
+$ scp -P 12034 -r cp-g@cluster.di.fct.unl.pt:~/Src/test_files/results .
+```
+
+### Note about runtests.sh
+*(The script makes use of a file called index.txt where each line corresponds to a test battery)*
+
+### Autores
+* Bernardo Baldaia - b.baldaia@campus.fct.unl.pt - 49901
+* João Frazão - jm.frazao@campus.fct.unl.pt - 51920
+* Miguel Candeias - mb.candeias@campus.fct.unl.pt - 50647
