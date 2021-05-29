@@ -174,6 +174,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr,"Error: Allocating the layer memory\n");
         exit( EXIT_FAILURE );
     }
+
+    int thrnum = 8;
+        int split = (layer_size/thrnum);
     
     //for( k=0; k<layer_size; k++ ) layer[k] = 0.0f;
     //for( k=0; k<layer_size; k++ ) layer_copy[k] = 0.0f;
@@ -192,7 +195,7 @@ int main(int argc, char *argv[]) {
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
 
-        #pragma omp parallel
+        #pragma omp parallel num_threads(thrnum)
         {
             #pragma omp for 
             for( j=0; j<storms[i].size; j++ ) {
@@ -202,8 +205,10 @@ int main(int argc, char *argv[]) {
                 int position = storms[i].posval[j*2];
 
                 /* For each cell in the layer */
+
+
                 
-                #pragma omp parallel
+                #pragma omp parallel num_threads(thrnum)
                     {
                     #pragma omp for
                     for( k=0; k<layer_size; k++ ) {
@@ -218,8 +223,7 @@ int main(int argc, char *argv[]) {
         /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
 
         /* Parameter of number of workers*/
-        int thrnum = 4;
-        int split = (layer_size/thrnum);
+        
 
         #pragma omp parallel num_threads(thrnum)
         {
@@ -234,19 +238,18 @@ int main(int argc, char *argv[]) {
 
             #pragma omp barrier
             
-            
-                for( k=1; k<layer_size-1; k++ ) {
+            #pragma omp for private(m,k)
+            for( k=1; k<layer_size-1; k++ ) {
                     layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3; 
                 }
         
         }
         
 
-        #pragma omp parallel
+        #pragma omp parallel num_threads(thrnum)
         {
             #pragma omp for private(m,k)
-            for(m = 0; m<thrnum; m++) {
-                for( k=(m*split)+1; k<(m*split + split)-1; k++ ) {
+                for( k=1; k<layer_size-1; k++ ) {
                     /* Check it only if it is a local maximum */
                     #pragma omp critical
                     {   
@@ -258,7 +261,7 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
-            }    
+               
         }
         /* 4.3. Locate the maximum value in the layer, and its position */
         }
