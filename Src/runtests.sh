@@ -3,13 +3,12 @@ COUNTER=1
 ARRSIZE=$1
 
 
-mkdir -p "test_files/results/size_$ARRSIZE"
 cat test_files/index.txt | while read line
 do	
 	echo "Running test battery # "$COUNTER
 
 	if [ "$COUNTER" -eq "9" ]; then 
-			echo "xd"
+			
 
 			./energy_storms_seq 16 $line >> "test_files/results/09_16".txt
 
