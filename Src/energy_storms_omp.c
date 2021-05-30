@@ -276,6 +276,9 @@ int main(int argc, char *argv[]) {
 
     /* 7. Results output, used by the Tablon online judge software */
     printf("\n");
+
+    printf("Size: %d\n", layer_size);
+    printf("Threads: %d\n", thrnum);
     /* 7.1. Total computation time */
     printf("Time: %lf\n", ttotal );
     /* 7.2. Print the maximum levels */
