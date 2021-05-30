@@ -49,15 +49,17 @@ do
 		fi
 
 		if [ "$COUNTER" -eq "9" ]; then 
-
+			
+			./energy_storms_seq 16 $line >> "test_files/results/09".txt
+			./energy_storms_seq 17 $line >> "test_files/results/09".txt
+			
+			
 			for T in "${THREADS[@]}"; do
 				
 
 				./energy_storms_seq 16 $line >> "test_files/results/09".txt
 
 				./energy_storms_omp $T 16 $line >> "test_files/results/09".txt
-
-				./energy_storms_seq 17 $line >> "test_files/results/09".txt
 
 				./energy_storms_omp $T 17 $line >> "test_files/results/09".txt
 
