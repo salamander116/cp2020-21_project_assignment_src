@@ -68,9 +68,9 @@ do
 
 			else
 
-				for T in "${THREADS[@]}"; do
+				./energy_storms_seq $line >> "test_files/results/$COUNTER".txt
 
-					./energy_storms_seq $line >> "test_files/results/$COUNTER".txt
+				for T in "${THREADS[@]}"; do
 
 					./energy_storms_omp $T $line >> "test_files/results/$COUNTER".txt
 
