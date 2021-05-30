@@ -14,8 +14,6 @@ do
 
 			./energy_storms_omp 2 $line >> "test_files/results/03".txt
 
-			./energy_storms_seq $line >> "test_files/results/03".txt
-
 			./energy_storms_omp 4 $line >> "test_files/results/03".txt
 		fi
 		
@@ -25,8 +23,6 @@ do
 			./energy_storms_seq $line >> "test_files/results/04".txt
 
 			./energy_storms_omp 2 $line >> "test_files/results/04".txt
-
-			./energy_storms_seq $line >> "test_files/results/04".txt
 
 			./energy_storms_omp 4 $line >> "test_files/results/04".txt
 
@@ -38,8 +34,6 @@ do
 
 			./energy_storms_omp 2 $line >> "test_files/results/05".txt
 
-			./energy_storms_seq $line >> "test_files/results/05".txt
-
 			./energy_storms_omp 4 $line >> "test_files/results/05".txt
 
 		fi
@@ -49,8 +43,6 @@ do
 			./energy_storms_seq $line >> "test_files/results/06".txt
 
 			./energy_storms_omp 2 $line >> "test_files/results/06".txt
-
-			./energy_storms_seq $line >> "test_files/results/06".txt
 
 			./energy_storms_omp 4 $line >> "test_files/results/06".txt
 
