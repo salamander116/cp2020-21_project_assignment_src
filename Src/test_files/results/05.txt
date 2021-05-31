@@ -1,0 +1,13 @@
+
+Time: 0.000020
+Result: 9 12829.288086
+
+Size: 20
+Threads: 2
+Time: 0.005358
+Result: 9 12829.288086
+
+Size: 20
+Threads: 4
+Time: 0.007297
+Result: 9 12829.288086
