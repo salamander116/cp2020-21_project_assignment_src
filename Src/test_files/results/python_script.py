@@ -72,18 +72,18 @@ def get_results(filename):
         
     speedUp = []
     efficiency = []
-    for x in range(len(time)):
-        su = float(time[0])/float(time[x])
+    for x in range(len(time) - 1):
+        su = float(time[0])/float(time[x+1])
         speedUp.append(su)  
-        ef = su/float(numThreads[x])
+        ef = su/float(numThreads[x+1])
         efficiency.append(ef)
 
     print(speedUp)
     print(efficiency)
-    plt.plot(numThreads, speedUp)
+    plt.plot(numThreads[1:], speedUp)
     plt.title("Speedup")
     plt.show()
-    plt.plot(numThreads, efficiency)
+    plt.plot(numThreads[1:], efficiency)
     plt.title("Efficiency")
     plt.show()
     
