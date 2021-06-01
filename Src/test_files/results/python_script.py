@@ -17,17 +17,14 @@ def parse(filename, endResult):
     
     info = [line.rstrip() for line in results]
     
-    thread_num = '0'
+    thread_num = '1'
     layer_size = '35'
     time = ''
-    print(info)
     os.system("echo Parsing file {}" )
     
     for line in info:
-        print(line)
         if line.startswith('Size',0):
             layer_size = line.split(':')[1].replace("\n", "").replace(" ", "")
-            print("HERE")
             
         elif line.startswith('Threads',0):
             thread_num = line.split(':')[1].replace("\n", "").replace(" ", "")
@@ -63,11 +60,39 @@ def get_final(new_file, results):
 
 def get_results(filename):
     file = open(filename)
-    resultRead = csv.DictReader(file)
-    print(resultRead)
+    numThreads = []
+    time = []
+    file = open(filename)
+    next(file)
+    for line in file:
+        lineArray = line.split(",")
+        lineArray[2] = lineArray[2].replace(" \n","")#removes the \n
+        numThreads.append(lineArray[1])
+        time.append(lineArray[2])
+        
+    speedUp = []
+    efficiency = []
+    for x in range(len(time)):
+        su = float(time[0])/float(time[x])
+        speedUp.append(su)  
+        ef = su/float(numThreads[x])
+        efficiency.append(ef)
+
+    print(speedUp)
+    print(efficiency)
+    plt.plot(numThreads, speedUp)
+    plt.title("Speedup")
+    plt.show()
+    plt.plot(numThreads, efficiency)
+    plt.title("Efficiency")
+    plt.show()
+    
+
     
 endResult ={}
 parse("1.txt", endResult)
 get_final("organizedResults.txt", endResult)
+get_results("organizedResults.txt")
 
 
+    
