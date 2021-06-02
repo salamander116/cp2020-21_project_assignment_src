@@ -12,13 +12,12 @@ import matplotlib
 import matplotlib.pyplot as plt
 import csv
 
-def parse(filename, endResult):
+def parse(filename, endResult, layer_size):
     results = open(filename, "r")
     
     info = [line.rstrip() for line in results]
     
     thread_num = '1'
-    layer_size = '35'
     time = ''
     os.system("echo Parsing file {}" )
     
@@ -81,18 +80,32 @@ def get_results(filename):
     print(speedUp)
     print(efficiency)
     plt.plot(numThreads[1:], speedUp)
-    plt.title("Speedup")
+    plt.title("Speedup " + filename)
     plt.show()
     plt.plot(numThreads[1:], efficiency)
-    plt.title("Efficiency")
+    plt.title("Efficiency " + filename)
     plt.show()
+
+def get_layerSizes(filename, layer_size):
+    file = open(filename)
+    for line in file:
+        value = line.split(" ")
+        layer_size.append(value[0])
+    del layer_size[-1]
     
 
     
-endResult ={}
-parse("1.txt", endResult)
-get_final("organizedResults.txt", endResult)
-get_results("organizedResults.txt")
+
+layer_size = []
+file_names = ["1.txt", "2.txt", "03.txt", "04.txt", "05.txt", "06.txt", "7.txt", "8.txt"]
+file_results = ["organized1.txt", "organized2.txt", "organized03.txt", "organized04.txt", "organized05.txt", "organized06.txt", "organized7.txt", "organized8.txt"]
+get_layerSizes("index.txt", layer_size)
+print(layer_size)
+for x in range (len(layer_size)):
+    endResult ={}
+    parse(file_names[x], endResult,layer_size[x])
+    get_final(file_results[x], endResult)
+    get_results(file_results[x])
 
 
     
