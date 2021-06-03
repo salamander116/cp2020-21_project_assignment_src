@@ -131,7 +131,43 @@ Storm read_storm_file( char *fname ) {
 
     return storm;
 }
+void impact(int i, int j, int k, Storm storms[], float *layer, int layer_size){
+     for( j=0; j<storms[i].size; j++ ) {
+            /* Get impact energy (expressed in thousandths) */
+            float energy = (float)storms[i].posval[j*2+1] * 1000;
+            /* Get impact position */
+            int position = storms[i].posval[j*2];
 
+            /* For each cell in the layer */
+            for( k=0; k<layer_size; k++ ) {
+                /* Update the energy value for the cell */
+                update( layer, layer_size, k, position, energy );
+            }
+        }
+ }
+
+ void relaxation(int k, float *layer_copy, float *layer, int layer_size){
+        for( k=0; k<layer_size; k++ ) 
+            layer_copy[k] = layer[k];
+
+        /* 4.2.2. Update layer using the ancillary values.
+                  Skip updating the first and last positions */
+        for( k=1; k<layer_size-1; k++ )
+            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+
+        
+ }
+ void findMax(int k,int i, float *layer, int layer_size, float *maximum, int *positions ){
+     for( k=1; k<layer_size-1; k++ ) {
+            /* Check it only if it is a local maximum */
+            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                if ( layer[k] > maximum[i] ) {
+                    maximum[i] = layer[k];
+                    positions[i] = k;
+                }
+            }
+        }
+ }
 /*
  * MAIN PROGRAM
  */
@@ -180,39 +216,20 @@ int main(int argc, char *argv[]) {
 
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
-        for( j=0; j<storms[i].size; j++ ) {
-            /* Get impact energy (expressed in thousandths) */
-            float energy = (float)storms[i].posval[j*2+1] * 1000;
-            /* Get impact position */
-            int position = storms[i].posval[j*2];
-
-            /* For each cell in the layer */
-            for( k=0; k<layer_size; k++ ) {
-                /* Update the energy value for the cell */
-                update( layer, layer_size, k, position, energy );
-            }
-        }
+        impact(i, j,k, storms, layer, layer_size);
 
         /* 4.2. Energy relaxation between storms */
-        /* 4.2.1. Copy values to the ancillary array */
-        for( k=0; k<layer_size; k++ ) 
-            layer_copy[k] = layer[k];
+        /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
 
-        /* 4.2.2. Update layer using the ancillary values.
-                  Skip updating the first and last positions */
-        for( k=1; k<layer_size-1; k++ )
-            layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3;
+        /* Parameter of number of workers*/
+        
 
+        
+        relaxation(k,layer_copy, layer,layer_size);  
+
+        
         /* 4.3. Locate the maximum value in the layer, and its position */
-        for( k=1; k<layer_size-1; k++ ) {
-            /* Check it only if it is a local maximum */
-            if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                if ( layer[k] > maximum[i] ) {
-                    maximum[i] = layer[k];
-                    positions[i] = k;
-                }
-            }
-        }
+        findMax(k,i,layer,layer_size, maximum,positions );
     }
 
     /* END: Do NOT optimize/parallelize the code below this point */

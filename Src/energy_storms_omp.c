@@ -134,6 +134,75 @@ Storm read_storm_file( char *fname ) {
     return storm;
 }
 
+void impact(int i, int j, int k, Storm storms[], float *layer, int layer_size, int thrnum){
+     #pragma omp parallel num_threads(thrnum)
+        {
+            #pragma omp for 
+            for( j=0; j<storms[i].size; j++ ) {
+                /* Get impact energy (expressed in thousandths) */
+                float energy = (float)storms[i].posval[j*2+1] * 1000;
+                /* Get impact position */
+                int position = storms[i].posval[j*2];
+
+                /* For each cell in the layer */
+
+
+                
+                #pragma omp parallel num_threads(thrnum)
+                    {
+                    #pragma omp for
+                    for( k=0; k<layer_size; k++ ) {
+                        /* Update the energy value for the cell */
+                        update( layer, layer_size, k, position, energy );
+                    }
+                }
+            }
+        }
+ }
+
+ void relaxation(int m, int k, float *layer_copy, float *layer, int layer_size, int thrnum, int split){
+        #pragma omp parallel num_threads(thrnum)
+        {
+            
+            #pragma omp for private(m,k)
+            for(m = 0; m<thrnum; m++){
+                for(k=m*split; k< (m*(split) + split) ; k++ ){
+                    layer_copy[k] = layer[k];
+                }
+            }
+            
+
+            #pragma omp barrier
+            
+            #pragma omp for private(m,k)
+            for( k=1; k<layer_size-1; k++ ) {
+                    layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3; 
+                }
+        
+        }
+        
+ }
+ void findMax(int m, int k,int i, float *layer, int layer_size, float *maximum, int *positions ,int thrnum){
+     #pragma omp parallel num_threads(thrnum)
+        {
+            #pragma omp for private(m,k)
+                for( k=1; k<layer_size-1; k++ ) {
+                    /* Check it only if it is a local maximum */
+                    #pragma omp critical
+                    {   
+                        if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
+                            if ( layer[k] > maximum[i] ) {
+                                maximum[i] = layer[k];
+                                positions[i] = k;
+                            } 
+                        }
+                    }
+                }
+               
+        }
+ }
+
+
 /*
  * MAIN PROGRAM
  */
@@ -193,29 +262,7 @@ int main(int argc, char *argv[]) {
         /* 4.1. Add impacts energies to layer cells */
         /* For each particle */
 
-        #pragma omp parallel num_threads(thrnum)
-        {
-            #pragma omp for 
-            for( j=0; j<storms[i].size; j++ ) {
-                /* Get impact energy (expressed in thousandths) */
-                float energy = (float)storms[i].posval[j*2+1] * 1000;
-                /* Get impact position */
-                int position = storms[i].posval[j*2];
-
-                /* For each cell in the layer */
-
-
-                
-                #pragma omp parallel num_threads(thrnum)
-                    {
-                    #pragma omp for
-                    for( k=0; k<layer_size; k++ ) {
-                        /* Update the energy value for the cell */
-                        update( layer, layer_size, k, position, energy );
-                    }
-                }
-            }
-        }
+       impact(i, j,k, storms, layer, layer_size, thrnum);
 
         /* 4.2. Energy relaxation between storms */
         /* 4.2.1 + 4.2.2 Copy values to the ancillary array and Update layer using the ancillary values */
@@ -223,46 +270,14 @@ int main(int argc, char *argv[]) {
         /* Parameter of number of workers*/
         
 
-        #pragma omp parallel num_threads(thrnum)
-        {
-            
-            #pragma omp for private(m,k)
-            for(m = 0; m<thrnum; m++){
-                for(k=m*split; k< (m*(split) + split) ; k++ ){
-                    layer_copy[k] = layer[k];
-                }
-            }
-            
-
-            #pragma omp barrier
-            
-            #pragma omp for private(m,k)
-            for( k=1; k<layer_size-1; k++ ) {
-                    layer[k] = ( layer_copy[k-1] + layer_copy[k] + layer_copy[k+1] ) / 3; 
-                }
         
-        }
-        
+        relaxation(m, k,layer_copy, layer,layer_size, thrnum, split);  
 
-        #pragma omp parallel num_threads(thrnum)
-        {
-            #pragma omp for private(m,k)
-                for( k=1; k<layer_size-1; k++ ) {
-                    /* Check it only if it is a local maximum */
-                    #pragma omp critical
-                    {   
-                        if ( layer[k] > layer[k-1] && layer[k] > layer[k+1] ) {
-                            if ( layer[k] > maximum[i] ) {
-                                maximum[i] = layer[k];
-                                positions[i] = k;
-                            } 
-                        }
-                    }
-                }
-               
-        }
+        
         /* 4.3. Locate the maximum value in the layer, and its position */
-        }
+        findMax(m,k,i,layer,layer_size, maximum,positions ,thrnum);
+        /* 4.3. Locate the maximum value in the layer, and its position */
+    }
     
     /* END: Do NOT optimize/parallelize the code below this point */
 
