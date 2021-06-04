@@ -1,33 +1,13 @@
- 5056.6509 |ooooooooooooooooooooooo
- 5250.4038 |oooooooooooooooooooooooo
- 5461.7935 |ooooooooooooooooooooooooo
- 5703.3638 |oooooooooooooooooooooooooo
- 5983.9023 |ooooooooooooooooooooooooooo
- 6316.7266 |ooooooooooooooooooooooooooooo
- 6723.6172 |ooooooooooooooooooooooooooooooo
- 7244.4478 |ooooooooooooooooooooooooooooooooo
- 7967.2476 |oooooooooooooooooooooooooooooooooooo
- 9177.2451 |oooooooooooooooooooooooooooooooooooooooooo
- 9773.0850 |ooooooooooooooooooooooooooooooooooooooooooooo
- 9986.7236 |ooooooooooooooooooooooooooooooooooooooooooooox
- 9667.5928 |oooooooooooooooooooooooooooooooooooooooooooo
-10045.8516 |oooooooooooooooooooooooooooooooooooooooooooooo
-11172.6396 |ooooooooooooooooooooooooooooooooooooooooooooooooooo
-12366.7158 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-12966.6328 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooox M0
-12057.6611 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-10526.6689 |oooooooooooooooooooooooooooooooooooooooooooooooo
- 8849.7900 |oooooooooooooooooooooooooooooooooooooooo
 
 Time: 0.000002
 Result: 16 12966.632812
 
 Size: 20
 Threads: 2
-Time: 0.000486
+Time: 0.001005
 Result: 16 12966.632812
 
 Size: 20
 Threads: 4
-Time: 0.000535
+Time: 0.003158
 Result: 16 12966.632812

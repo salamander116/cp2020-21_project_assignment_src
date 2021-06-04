@@ -1,79 +1,46 @@
-  133.9904 |oooooooooooooooooooooooooooooooooooooooooo
-  152.5367 |oooooooooooooooooooooooooooooooooooooooooooooooo
-  163.9952 |oooooooooooooooooooooooooooooooooooooooooooooooooooo
-  174.0256 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  186.5829 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  189.0049 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooox M0
-  182.8665 |oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  162.7434 |ooooooooooooooooooooooooooooooooooooooooooooooooooo
-  153.8218 |oooooooooooooooooooooooooooooooooooooooooooooooo
-  149.8974 |ooooooooooooooooooooooooooooooooooooooooooooooo
-  149.3801 |ooooooooooooooooooooooooooooooooooooooooooooooo
-  152.0206 |oooooooooooooooooooooooooooooooooooooooooooooooo
-  158.5377 |oooooooooooooooooooooooooooooooooooooooooooooooooo
-  171.3987 |oooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  199.7667 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  241.8927 |oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 
 Time: 0.000002
 Result: 5 189.004868
-  126.1086 |ooooooooooooooooooooooooooooooooooooooo
-  143.5639 |oooooooooooooooooooooooooooooooooooooooooooo
-  154.3485 |ooooooooooooooooooooooooooooooooooooooooooooooo
-  163.7888 |oooooooooooooooooooooooooooooooooooooooooooooooooo
-  175.6075 |oooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  177.8869 |oooooooooooooooooooooooooooooooooooooooooooooooooooooox
-  172.1097 |ooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  153.1703 |ooooooooooooooooooooooooooooooooooooooooooooooo
-  144.7735 |oooooooooooooooooooooooooooooooooooooooooooo
-  141.0798 |ooooooooooooooooooooooooooooooooooooooooooo
-  140.5931 |ooooooooooooooooooooooooooooooooooooooooooo
-  143.0782 |oooooooooooooooooooooooooooooooooooooooooooo
-  149.2119 |oooooooooooooooooooooooooooooooooooooooooooooo
-  161.3164 |oooooooooooooooooooooooooooooooooooooooooooooooooo
-  188.0157 |oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-  193.2996 |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooox M0
-  173.9335 |ooooooooooooooooooooooooooooooooooooooooooooooooooooo
 
-Time: 0.000001
+Time: 0.000003
 Result: 15 193.299606
 
 Size: 16
 Threads: 4
-Time: 0.016203
+Time: 0.000458
 Result: 5 189.004868
 
 Size: 17
 Threads: 4
-Time: 0.004688
+Time: 0.000283
 Result: 14 188.015732
 
 Size: 16
 Threads: 8
-Time: 0.005903
+Time: 0.004863
 Result: 5 189.004868
 
 Size: 17
 Threads: 8
-Time: 0.020549
+Time: 0.004884
 Result: 14 188.015732
 
 Size: 16
 Threads: 16
-Time: 0.023596
+Time: 0.027053
 Result: 5 189.004868
 
 Size: 17
 Threads: 16
-Time: 0.044753
-Result: 14 188.015732
+Time: 0.009504
+Result: 14 188.015747
 
 Size: 16
 Threads: 32
-Time: 0.004821
+Time: 0.009443
 Result: 0 0.000000
 
 Size: 17
 Threads: 32
-Time: 0.009633
+Time: 0.008938
 Result: 0 0.000000
