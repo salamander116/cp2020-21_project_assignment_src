@@ -57,34 +57,57 @@ def get_final(new_file, results):
             file.write("\n")
 
 
-def get_results(filename):
-    file = open(filename)
+def get_results(filename1, filename2):
     numThreads = []
-    time = []
-    file = open(filename)
+    timeLocal = []
+    file = open(filename1)
     next(file)
     for line in file:
         lineArray = line.split(",")
         lineArray[2] = lineArray[2].replace(" \n","")#removes the \n
         numThreads.append(lineArray[1])
-        time.append(lineArray[2])
+        timeLocal.append(lineArray[2])
         
-    speedUp = []
-    efficiency = []
-    for x in range(len(time) - 1):
-        su = float(time[0])/float(time[x+1])
-        speedUp.append(su)  
+    speedUpLocal = []
+    efficiencyLocal = []
+    for x in range(len(timeLocal) - 1):
+        su = float(timeLocal[0])/float(timeLocal[x+1])
+        speedUpLocal.append(su)  
         ef = su/float(numThreads[x+1])
-        efficiency.append(ef)
-
-    print(speedUp)
-    print(efficiency)
-    plt.plot(numThreads[1:], speedUp)
-    plt.title("Speedup " + filename)
+        efficiencyLocal.append(ef)
+    
+    timeCluster = []
+    file = open(filename2)
+    next(file)
+    for line in file:
+        lineArray = line.split(",")
+        lineArray[2] = lineArray[2].replace(" \n","")#removes the \n
+        
+        timeCluster.append(lineArray[2])
+        
+    speedUpCluster = []
+    efficiencyCluster = []
+    for x in range(len(timeCluster) - 1):
+        su = float(timeCluster[0])/float(timeCluster[x+1])
+        speedUpCluster.append(su)  
+        ef = su/float(numThreads[x+1])
+        efficiencyCluster.append(ef)
+    
+    
+    print("speedup cluster ",speedUpCluster)
+    print("speedup local ", speedUpLocal)
+    fname = filename2.split(".")[0]
+    plt.plot(numThreads[1:], speedUpLocal)
+    plt.plot(numThreads[1:],speedUpCluster)
+    plt.legend(["Local", "Cluster"])
+    plt.title("Speedup " + fname+ " local")
     plt.show()
-    plt.plot(numThreads[1:], efficiency)
-    plt.title("Efficiency " + filename)
+    plt.plot(numThreads[1:], efficiencyLocal)
+    plt.plot(numThreads[1:], efficiencyCluster)
+    plt.legend(["Local", "Cluster"])
+    plt.title("Efficiency " + fname + " local")
     plt.show()
+   
 
 def get_layerSizes(filename, layer_size):
     file = open(filename)
@@ -97,15 +120,21 @@ def get_layerSizes(filename, layer_size):
     
 
 layer_size = []
-file_names = ["1.txt", "2.txt", "03.txt", "04.txt", "05.txt", "06.txt", "7.txt", "8.txt"]
-file_results = ["organized1.txt", "organized2.txt", "organized03.txt", "organized04.txt", "organized05.txt", "organized06.txt", "organized7.txt", "organized8.txt"]
+file_names = ["local1.txt","1.txt","local2.txt","2.txt","local03.txt","03.txt","local04.txt","04.txt","local05.txt","05.txt","local06.txt","06.txt","local7.txt","7.txt","local8.txt","8.txt"]
+file_results = ["results1Local.txt", "results1Cluster.txt","results2Local.txt", "results2Cluster.txt","results3Local.txt", "results3Cluster.txt","results4Local.txt", "results4Cluster.txt","results5Local.txt", "results5Cluster.txt","results6Local.txt", "results6Cluster.txt","results7Local.txt", "results7Cluster.txt","results8Local.txt", "results8Cluster.txt"]
 get_layerSizes("index.txt", layer_size)
 print(layer_size)
 for x in range (len(layer_size)):
-    endResult ={}
-    parse(file_names[x], endResult,layer_size[x])
-    get_final(file_results[x], endResult)
-    get_results(file_results[x])
+    print("x: ", x)
+    endResultLocal ={}
+    endResultCluster ={}
+    parse(file_names[x*2], endResultLocal,layer_size[x])
+    get_final(file_results[x*2], endResultLocal)
+    parse(file_names[x*2 +1], endResultCluster,layer_size[x])
+    get_final(file_results[x*2 +1], endResultCluster)
+    print(file_results[x*2])
+    print(file_results[x*2 +1])
+    get_results(file_results[x*2], file_results[x*2 +1])
 
 
     

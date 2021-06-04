@@ -1,13 +1,13 @@
 
-Time: 0.000002
+Time: 0.000018
 Result: 16 12829.288086
 
 Size: 20
 Threads: 2
-Time: 0.002497
+Time: 0.007820
 Result: 16 12829.288086
 
 Size: 20
 Threads: 4
-Time: 0.000321
+Time: 0.007073
 Result: 16 12829.288086
