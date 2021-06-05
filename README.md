@@ -1,5 +1,7 @@
 # Simplified simulation of high-energy particle storms
 
+#### [Report](Report/Report_49901_50647_51920.pdf)
+
 ### EduHPC 2018: Peachy assignment
 
 (c) 2018 Arturo Gonzalez-Escribano, Eduardo Rodriguez-Gutiez
@@ -61,7 +63,7 @@ $ scp -P 12034 -r cp-g@cluster.di.fct.unl.pt:~/Src/test_files/results .
 ### Note about runtests.sh
 *(The script makes use of a file called index.txt where each line corresponds to a test battery)*
 
-### Autores
+### Authors
 * Bernardo Baldaia - b.baldaia@campus.fct.unl.pt - 49901
 * João Frazão - jm.frazao@campus.fct.unl.pt - 51920
 * Miguel Candeias - mb.candeias@campus.fct.unl.pt - 50647
