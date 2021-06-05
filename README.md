@@ -51,7 +51,7 @@ $ oarsub -l nodes=2 -I
 ```bash
 $ cd Src
 $ make all
-$ sh runtests.sh
+$ ./runtests.sh
 ```
 *(where argument in runtests.sh is size of the layer array)*
 
